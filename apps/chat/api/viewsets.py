@@ -47,3 +47,13 @@ class ChatRoomViewSet(viewsets.ModelViewSet):
         serializer = ChatRoomSerializer(instance=room)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+
+class HeartbeatViewSet(viewsets.ViewSet):
+    """
+    Class representing a heartbeat viewset
+    """
+    http_method_names = ["get", "head", "options"]
+
+    def list(self, request):
+        return Response({"status": "ok"}, status=status.HTTP_200_OK)

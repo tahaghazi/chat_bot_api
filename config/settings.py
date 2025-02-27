@@ -9,12 +9,20 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
+import asyncio
 import datetime
 from pathlib import Path
+from uuid import uuid4
 
 import django
+import tldextract
+from chatbot.crawler import Crawler
+from chatbot.rag.cohere_rag import CohereRAG
+from chatbot.utils.utils import extract_from_file, INDEXES_DIR
 from django.utils.encoding import force_str, smart_str
 from django.utils.translation import gettext, gettext_lazy
+
+from apps.chat.tests import extract_domain_name
 
 django.utils.encoding.smart_text = smart_str
 django.utils.encoding.force_text = force_str
@@ -251,3 +259,16 @@ CSRF_TRUSTED_ORIGINS = [
 # ==============================================================================
 
 CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
+
+# ==============================================================================
+# CHATBOT SETTINGS
+# ==============================================================================
+
+link = "https://ai.pydantic.dev/"
+domain_name = extract_domain_name(link)
+
+c = Crawler(link, domain_name)
+content_path = asyncio.run(c.extract_content(link, webpage_only=True))
+extract_from_file(r"path/to/file.ext", content_path)
+
+CHATBOT_RAG = CohereRAG(content_path, INDEXES_DIR)

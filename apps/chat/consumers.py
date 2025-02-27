@@ -6,6 +6,7 @@ from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
 from apps.chat.api.serializers import ChatMessageSerializer
 from apps.chat.models import ChatMessage, ChatRoom
+from config.settings import CHATBOT_RAG
 
 
 @sync_to_async
@@ -50,21 +51,38 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         type = data.get("type", "chat_message")
 
         if type == "chat_message":
-            message = await self.save_message(
+            message_data = await self.save_message(
+                self.user,
                 self.room_id,
                 message,
                 files,
             )
+            response = CHATBOT_RAG.get_response(message, self.user.id)
+            response_data = await self.save_message(
+                None,
+                self.room_id,
+                response,
+                [],
+            )
 
-        # Send message to room group
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                "type": type,
-                "message": message,
-                "files": files,
-            },
-        )
+            # Send message to room group
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    "type": type,
+                    "message": message_data,
+                    "files": files,
+                },
+            )
+            # Send message to room group
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    "type": type,
+                    "message": response_data,
+                    "files": [],
+                },
+            )
 
     # Receive message from room group
     async def chat_message(self, event):
@@ -86,12 +104,13 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     @sync_to_async
     def save_message(
             self,
+            user,
             room_id,
             message,
             files,
     ):
         message = ChatMessage.objects.create(
-            user=self.user,
+            user=user,
             room_id=room_id,
             message=message,
         )
