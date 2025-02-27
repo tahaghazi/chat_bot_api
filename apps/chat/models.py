@@ -21,6 +21,9 @@ class ChatFile(models.Model):
     def get_mimetype(self):
         return mimetypes.guess_type(self.file.name)[0]
 
+    def file_name(self):
+        return self.file.name[self.file.name.rfind("/") + 1:]
+
 
 class ChatRoom(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)

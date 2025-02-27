@@ -1,8 +1,9 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, viewsets
+from rest_framework import filters, viewsets, status
+from rest_framework.response import Response
 
-from apps.chat.api.serializers import ChatMessageSerializer, FileSerializer
-from apps.chat.models import ChatMessage, ChatFile
+from apps.chat.api.serializers import ChatMessageSerializer, FileSerializer, ChatRoomSerializer
+from apps.chat.models import ChatMessage, ChatFile, ChatRoom
 
 
 class ChatMessageViewSet(viewsets.ModelViewSet):
@@ -32,3 +33,17 @@ class FileViewSet(viewsets.ModelViewSet):
     serializer_class = FileSerializer
     http_method_names = ["get", "head", "options", "post"]
     queryset = ChatFile.objects.all()
+
+
+class ChatRoomViewSet(viewsets.ModelViewSet):
+    serializer_class = ChatRoomSerializer
+    http_method_names = ["get", "head", "options", "post"]
+
+    def get_queryset(self):
+        return ChatRoom.objects.filter(user=self.request.user)
+
+    def create(self, request, *args, **kwargs):
+        room = ChatRoom.objects.create(user=self.request.user)
+        serializer = ChatRoomSerializer(instance=room)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)

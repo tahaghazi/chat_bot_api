@@ -20,7 +20,12 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
+from apps.chat.api.viewsets import ChatRoomViewSet, ChatMessageViewSet, FileViewSet
+
 router = DefaultRouter()
+router.register("chat/rooms", ChatRoomViewSet, basename="chat-rooms")
+router.register("chat/messages", ChatMessageViewSet, basename="chat-messages")
+router.register("chat/files", FileViewSet, basename="chat-files")
 
 urlpatterns = [
     path('admin/', admin.site.urls),

@@ -46,7 +46,10 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    "daphne",
+
     'django.contrib.staticfiles',
+    "channels",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
@@ -97,6 +100,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
+ASGI_APPLICATION = "config.asgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
@@ -188,7 +192,7 @@ SIMPLE_JWT = {
 REST_USE_JWT = True
 
 REST_AUTH_REGISTER_SERIALIZERS = {
-    # "REGISTER_SERIALIZER": "apps.users.api.serializers.RegisterSerializer",
+    "REGISTER_SERIALIZER": "core.serializers.RegisterSerializer",
 }
 
 REST_AUTH_SERIALIZERS = {
@@ -241,3 +245,9 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000',
     'http://127.0.0.1:3000',
 ]
+
+# ==============================================================================
+# CHANNELS SETTINGS
+# ==============================================================================
+
+CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
