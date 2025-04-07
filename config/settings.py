@@ -68,9 +68,8 @@ INSTALLED_APPS = [
     'dj_rest_auth',
     'dj_rest_auth.registration',
     'corsheaders',
-    "apps.chat"
-
-
+    "apps.users",
+    "apps.chat",
 
 ]
 
@@ -200,11 +199,11 @@ SIMPLE_JWT = {
 REST_USE_JWT = True
 
 REST_AUTH_REGISTER_SERIALIZERS = {
-    "REGISTER_SERIALIZER": "core.serializers.RegisterSerializer",
+    "REGISTER_SERIALIZER": "apps.users.api.serializers.RegisterOrGetUserSerializer",
 }
 
 REST_AUTH_SERIALIZERS = {
-    # "USER_DETAILS_SERIALIZER": "src.apps.authentication.custom_account.api.serializers.UserDetailsSerializer",
+    "USER_DETAILS_SERIALIZER": "apps.users.api.serializers.UserDetailsSerializer",
     # "LOGIN_SERIALIZER": "apps.users.api.serializers.CustomLoginSerializer",
     # "PASSWORD_RESET_SERIALIZER": "src.apps.authentication.custom_account.api.serializers.CustomPasswordResetSerializer",  # noqa
 }
@@ -274,3 +273,5 @@ content_path = asyncio.run(c.extract_content(link, webpage_only=True))
 extract_from_file(r"path/to/file.ext", content_path)
 
 CHATBOT_RAG = CohereRAG(content_path, INDEXES_DIR)
+
+AUTH_USER_MODEL = 'users.CustomUser'

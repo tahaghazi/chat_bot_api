@@ -57,6 +57,15 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 message,
                 files,
             )
+            # Send message to room group
+            self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    "type": type,
+                    "message": message_data,
+                    "files": files,
+                },
+            )
             response = CHATBOT_RAG.get_response(message, self.user.id)
             response_data = await self.save_message(
                 None,
@@ -65,17 +74,9 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 [],
             )
 
+
             # Send message to room group
-            await self.channel_layer.group_send(
-                self.room_group_name,
-                {
-                    "type": type,
-                    "message": message_data,
-                    "files": files,
-                },
-            )
-            # Send message to room group
-            await self.channel_layer.group_send(
+            self.channel_layer.group_send(
                 self.room_group_name,
                 {
                     "type": type,
