@@ -76,7 +76,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
 
             # Send message to room group
-            self.channel_layer.group_send(
+            await self.channel_layer.group_send(
                 self.room_group_name,
                 {
                     "type": type,
